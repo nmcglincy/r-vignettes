@@ -18,3 +18,6 @@ plot(fit)
 # EXTRACTING INTERESTING RESULTS AS A DATAFRAME
 res = setsResults(fit)
 subset(res, estimate > 0.5)
+# 
+# READING FULL GAF FILE
+go.full = readGAF(filename = "gene_association.sgd")
