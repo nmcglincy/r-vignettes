@@ -185,15 +185,58 @@ aspect.l.slm.l = lapply(aspect.l.slm, dlply, .(GO_ID))
 # Make each bit into a list of SGDID by GO_ID
 aspect.l.final = lapply(aspect.l.slm.l, lapply, function(x) {x = unique(as.vector(x$SGDID))})
 str(aspect.l.final)
-
-
-gaf.slm.l = dlply(gaf.data.slm, .(GO_ID))
-gaf.slm.l = lapply(gaf.slm.l, function(x) {x = as.vector(x$SGDID)})
-head(gaf.slm.l)
+# Ok, that looks like how I wanted
+# 
+# Converting from symbol or systematic name to SGDID
 example_o
 library(org.Sc.sgd.db)
 ls("package:org.Sc.sgd.db")
+# these tables look interesting:
+summary(org.Sc.sgdCOMMON2ORF)
+# symbol (accepted?) to systematic name
+summary(org.Sc.sgdDESCRIPTION)
+# systematic name to description
+summary(org.Sc.sgdSGD)
+# systematic name to SGDID
+summary(org.Sc.sgdALIAS)
+# systematic name to alias (like an alternative symbol?)
+summary(org.Sc.sgdALIAS2ORF)
+# the same as above?
+summary(org.Sc.sgdGENENAME)
+# don't understand this one - the first couple entries are the same in both tables
+# 
+# attempt to map example_o > systematic_name > SGDID
+example_o
 
+# Convert to a list
+xx <- as.list(org.Sc.sgdCOMMON2ORF)
+str(xx)
+length(xx)
+# Remove probes that do not map in COMMON2ORF
+xx <- xx[!is.na(xx)]
+if(length(xx) > 0){
+  # Gets the ORF identifiers for the first five gene names/alias
+  xx[1:5]
+  # Get the first one
+  xx[[1]]
+}
+xx[example_o]
+example_o
+
+yy = as.list(org.Sc.sgdALIAS2ORF)
+head(yy)
+yy[example_o]
+# Dont' use this one, it's mapping the actual SGD alias
+
+alias
+
+
+x = org.Sc.sgdCOMMON2OR
+mapped_genes = mappedkeys(x)
+head(mapped_genes)
+
+rm(x)
+rm(mapped_genes)
 x <- org.Sc.sgdSGD
 # Get the Systematic ORF Accessions that are mapped to a SGD ID
 mapped_genes <- mappedkeys(x)
