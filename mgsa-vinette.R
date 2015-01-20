@@ -65,3 +65,122 @@ devtools::session_info()
 # S4Vectors     * 0.4.0     2014-10-14 Bioconductor  
 
 # POSTED ONTO BIOCONDUCTOR SUPPORT PAGE
+# 
+# 
+vignette("mgsa")
+mgsa( c("A", "B"), list(set1=LETTERS[1:3], set2=LETTERS[2:5]) )
+
+gaf.data = read.table("gene_association.sgd",
+                      header = FALSE,
+                      skip = 26,
+                      stringsAsFactors = FALSE,
+                      sep = "\t",
+                      fill = TRUE,
+                      row.names = NULL,
+                      quote = "")
+# Error in scan(file, what, nmax, sep, dec, quote, skip, nlines, na.strings,  : 
+#                 line 16253 did not have 17 elements
+# 
+# NO IDEA WHAT THIS IS REFERING TO, LOOKS FINE TO ME - try adding fill = TRUE
+# 
+# Warning message:
+#   In scan(file, what, nmax, sep, dec, quote, skip, nlines, na.strings,  :
+#             EOF within quoted string
+# http://stackoverflow.com/questions/17414776/read-csv-warning-eof-within-quoted-string-prevents-complete-reading-of-file
+dim(gaf.data)
+# Columns are:
+#   
+#   1: DB, database contributing the file (always "SGD" for this file).
+# 2: DB_Object_ID, SGDID (SGD's unique identifier for genes and
+#     features).
+#  3: DB_Object_Symbol, see below
+#  4: Qualifier (optional), one or more of 'NOT', 'contributes_to',
+#     'colocalizes_with' as qualifier(s) for a GO annotation, when needed,
+#     multiples separated by pipe (|)
+#  5: GO ID, unique numeric identifier for the GO term
+#  6: DB:Reference(|DB:Reference), the reference associated with the GO
+#     annotation
+#  7: Evidence, the evidence code for the GO annotation
+#  8: With (or) From (optional), any With or From qualifier for the GO
+#     annotation
+#  9: Aspect, which ontology the GO term belongs (Function, Process or
+#     Component)
+# 10: DB_Object_Name(|Name) (optional), a name for the gene product in
+#     words, e.g. 'acid phosphatase'
+# 11: DB_Object_Synonym(|Synonym) (optional), see below
+# 12: DB_Object_Type, type of object annotated, e.g. gene, protein, etc.
+# 13: taxon(|taxon), taxonomic identifier of species encoding gene
+#     product
+# 14: Date, date GO annotation was defined in the format YYYYMMDD
+# 15: Assigned_by, source of the annotation (always "SGD" for this file)
+# 16: Annotation Extension, optional, Contains cross references to other
+#     ontologies that can be used to qualify or enhance the
+#     annotation. The cross-reference is prefaced by an appropriate GO
+#     relationship; references to multiple ontologies can be
+#     entered. For example, if a gene product is localized to the
+#     mitochondria of lymphocytes, the GO ID (column 5) would be
+#     mitochondrion ; GO:0005439, and the annotation extension column
+#     would contain a cross-reference to the term lymphocyte from the
+#     Cell Type Ontology.
+# 17: Gene Product Form ID, optional, this field allows the annotation
+#     of specific variants of that gene or gene
+#     product. UniProtKB:P12345-2
+# 
+# Note on SGD nomenclature, pertains to columns 3 and 11:
+# 
+# Column 3 - When a Standard Gene Name (e.g. CDC28, COX2) has been
+# conferred, it will be present in Column 3. When no Gene Name has been
+# conferred, the Systematic Name (e.g. YAL001C, YGR116W, YAL034W-A) will
+# be present in column 3.
+# 
+# Column 11 - The Systematic Name (e.g. YAL001C, YGR116W, YAL034W-A,
+# Q0010) will be the first name present in Column 11. Any other names
+# (except the Standard Name, which will be in Column 3 if one exists),
+# including Aliases used for the gene will also be present in this
+# column.
+names(gaf.data) = c("DB",
+					"SGDID",
+					"DB_Symbol",
+					"Qualifier",
+					"GO_ID",
+					"DB_Reference",
+					"Evidence",
+					"With",
+					"Aspect", 
+					"DB_Object_Name",
+					"DB_Object_Synonym",
+					"DB_Object_Type",
+					"taxon",
+					"Date",
+					"Assigned_by",
+					"Annotation_Extension",
+					"Gene_Product_Form_ID")
+head(gaf.data)
+# 
+# In principle this should be a list of SGDID by GO_ID 
+library(plyr);library(dplyr)
+gaf.data.slm = gaf.data %>%
+  select(SGDID, GO_ID)
+head(gaf.data.slm)
+gaf.slm.l = dlply(gaf.data.slm, .(GO_ID))
+gaf.slm.l = lapply(gaf.slm.l, function(x) {x = as.vector(x$SGDID)})
+head(gaf.slm.l)
+example_o
+library(org.Sc.sgd.db)
+ls("package:org.Sc.sgd.db")
+
+x <- org.Sc.sgdSGD
+# Get the Systematic ORF Accessions that are mapped to a SGD ID
+mapped_genes <- mappedkeys(x)
+?mappedkeys
+mapped_genes
+# Convert to a list
+xx <- as.list(x[mapped_genes])
+xx
+head(xx)
+if(length(xx) > 0) {
+  # Get the SGD gene IDs for the first five genes
+  xx[1:5]
+  # Get the first one
+  xx[[1]]
+}
