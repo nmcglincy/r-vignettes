@@ -220,35 +220,30 @@ if(length(xx) > 0){
   # Get the first one
   xx[[1]]
 }
-xx[example_o]
-example_o
-
-yy = as.list(org.Sc.sgdALIAS2ORF)
+foo = xx[example_o]
+# PROBLEM 
+#   one has an NA
+#   two have more than one association
+#     looked at both manually in SGD; both times the first hit was the right one, might
+#     be a general strategy
+lapply(foo, length)
+bar = ldply(lapply(foo, function(x) {x = x[1]}))
+names(bar) = c("symbol", "sys.id")
+bar
+yy = as.list(org.Sc.sgdSGD)
 head(yy)
-yy[example_o]
-# Dont' use this one, it's mapping the actual SGD alias
+tail(yy)
+length(yy)
+yy = yy[!is.na(yy)]
+yy[bar$sys.id]
 
-alias
+foo2 = yy[bar$sys.id]
+bar2 = ldply(lapply(foo2, function(x) {x = x[1]}))
+names(bar2) = c("sys.id", "sgdid")
 
+banana = merge(bar, bar2,
+               by.x = "sys.id",
+               by.y = "sys.id")
+banana
+length(example_o)
 
-x = org.Sc.sgdCOMMON2OR
-mapped_genes = mappedkeys(x)
-head(mapped_genes)
-
-rm(x)
-rm(mapped_genes)
-x <- org.Sc.sgdSGD
-# Get the Systematic ORF Accessions that are mapped to a SGD ID
-mapped_genes <- mappedkeys(x)
-?mappedkeys
-mapped_genes
-# Convert to a list
-xx <- as.list(x[mapped_genes])
-xx
-head(xx)
-if(length(xx) > 0) {
-  # Get the SGD gene IDs for the first five genes
-  xx[1:5]
-  # Get the first one
-  xx[[1]]
-}
