@@ -87,7 +87,9 @@ gaf.data = read.table("gene_association.sgd",
 #   In scan(file, what, nmax, sep, dec, quote, skip, nlines, na.strings,  :
 #             EOF within quoted string
 # http://stackoverflow.com/questions/17414776/read-csv-warning-eof-within-quoted-string-prevents-complete-reading-of-file
-dim(gaf.data)
+# dim(gaf.data)
+# 
+#### 
 # Columns are:
 #   
 #   1: DB, database contributing the file (always "SGD" for this file).
@@ -138,6 +140,7 @@ dim(gaf.data)
 # (except the Standard Name, which will be in Column 3 if one exists),
 # including Aliases used for the gene will also be present in this
 # column.
+# ###
 names(gaf.data) = c("DB",
 					"SGDID",
 					"DB_Symbol",
@@ -155,13 +158,35 @@ names(gaf.data) = c("DB",
 					"Assigned_by",
 					"Annotation_Extension",
 					"Gene_Product_Form_ID")
-head(gaf.data)
+# head(gaf.data)
 # 
-# In principle this should be a list of SGDID by GO_ID 
-library(plyr);library(dplyr)
-gaf.data.slm = gaf.data %>%
-  select(SGDID, GO_ID)
-head(gaf.data.slm)
+# Split by Aspect to make separate analyses of Function, Process or Component
+aspect.l = list(Function  = subset(gaf.data, Aspect == "F"),
+                Process   = subset(gaf.data, Aspect == "P"),
+                Component = subset(gaf.data, Aspect == "C"))
+# 
+# From each subset, select the SGDID & GO_ID
+selectSGDIDandGOID = function(x) {
+  require(dplyr)
+  x %>%
+    select(SGDID, GO_ID)
+}
+aspect.l.slm = lapply(aspect.l, selectSGDIDandGOID)
+str(aspect.l.slm)
+library(plyr)
+aspect.l.slm.l = lapply(aspect.l.slm, dlply, .(GO_ID))
+# 
+# Within one GO term, SGDIDs are represented multiple times because there is one entry
+# per evidence code, also were there are different sources of information for the same
+# evidence code. I can't see the sense in maintaining the repitition if I'm removing 
+# the rest of the information, if I want to sort by evidence code, then I'll have to 
+# do it at the original subset command
+# 
+# Make each bit into a list of SGDID by GO_ID
+aspect.l.final = lapply(aspect.l.slm.l, lapply, function(x) {x = unique(as.vector(x$SGDID))})
+str(aspect.l.final)
+
+
 gaf.slm.l = dlply(gaf.data.slm, .(GO_ID))
 gaf.slm.l = lapply(gaf.slm.l, function(x) {x = as.vector(x$SGDID)})
 head(gaf.slm.l)
