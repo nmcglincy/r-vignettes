@@ -232,6 +232,8 @@ names(bar) = c("symbol", "sys.id")
 bar
 yy = as.list(org.Sc.sgdSGD)
 head(yy)
+
+summary(org.Sc.sgdGO)
 tail(yy)
 length(yy)
 yy = yy[!is.na(yy)]
@@ -246,4 +248,36 @@ banana = merge(bar, bar2,
                by.y = "sys.id")
 banana
 length(example_o)
+# 
+# The only problem with all of this is that I'm not sure whether this preserves all the 
+# parent-child relationships in the terms, and I have this nagging feeling the lists are
+# too short
+?mgsa
+unfilt.gaf.func = new("MgsaSets", sets = aspect.l.final$Function)
+fit.func = mgsa(banana$sgdid, unfilt.gaf.func)
+fit.func
+res.func = setsResults(fit.func)
+subset(res.func, estimate > 0.5)
+
+
+unfilt.gaf.proc = new("MgsaSets", sets = aspect.l.final$Process)
+fit.proc = mgsa(banana$sgdid, unfilt.gaf.proc)
+plot(fit.proc)
+
+unfilt.gaf.comp = new("MgsaSets", sets = aspect.l.final$Component)
+fit.comp = mgsa(banana$sgdid, unfilt.gaf.comp)
+plot(fit.comp)
+fit.comp
+
+str(unfilt.gaf.comp)
+names(unfilt.gaf.comp@sets)
+# 
+# Would be cool to incorporate the item & set annotations, should be able to port
+# them over from the GAF, or through the tables
+summary(org.Sc.sgdGO)
+summary(org.Sc.sgdGO2ORF)
+summary(org.Sc.sgdGO2ALLORFS)
+
+
+
 
