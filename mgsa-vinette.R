@@ -278,6 +278,19 @@ summary(org.Sc.sgdGO)
 summary(org.Sc.sgdGO2ORF)
 summary(org.Sc.sgdGO2ALLORFS)
 
+library(GO.db)
+ls("package:GO.db")
+xx <- as.list(GOTERM)
+head(xx)
+str(xx[1])
+res.func.sig = subset(res.func, estimate > 0.5)
+res.func.sig
+sig.func.go = rownames(res.func.sig)
+sig.func.go
 
-
+foo = xx[sig.func.go]
+ldply(foo)
+str(foo)
+str(lapply(foo, unlist))
+lapply(foo, Term)
 
