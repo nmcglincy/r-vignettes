@@ -51,6 +51,28 @@ str(metadata(rowData(se)))
 
 #############
 # Exploring the alternative: featureCounts() from package Rsubread
+# 
+# Need some mapped reads first, from the vignette
+source("http://bioconductor.org/biocLite.R")
+biocLite("Rsubread")
+library(Rsubread)
+ref <- system.file("extdata","reference.fa",package="Rsubread")
+ref
+buildindex(basename="reference_index",reference=ref)
+reads <- system.file("extdata","reads.txt.gz",package="Rsubread")
+align(index="reference_index",readfile1=reads,output_file="alignResults.BAM")
+ann <- data.frame(GeneID=c("gene1","gene1","gene2","gene2"),
+                  Chr="chr_dummy",
+                  Start=c(100,1000,3000,5000),
+                  End=c(500,1800,4000,5500),
+                  Strand=c("+","+","-","-"),
+                  stringsAsFactors=FALSE)
+ann
+fc_SE <- featureCounts("alignResults.BAM",annot.ext=ann)
+fc_SE
+# Yeah, this is cool because the annotation is so flexible, but making sure only the right alignments 
+# are counted seems more straightforward with summerizeOverlaps
+
 
 
 
